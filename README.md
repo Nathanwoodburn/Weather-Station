@@ -1,5 +1,4 @@
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-# Weather-Station
+# Weather Station
 Weather Station using a Wemos D1 Mini Pro V1.0 with a 1.44" TFT LCD Screen
 
 This project gets weather updates from [openweathermap.org](openweathermap.org) using a free API Key.
