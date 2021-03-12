@@ -1,4 +1,3 @@
-<
 # Weather Station
 Weather Station using a Wemos D1 Mini Pro V1.0 with a 1.44" TFT LCD Screen
 
@@ -8,5 +7,7 @@ This project also sends updates to [ThingSpeak IoT](https://thingspeak.com) usin
 
 Using the [instructable to convert images to Flash memory](https://www.instructables.com/Converting-Images-to-Flash-Memory-Iconsimages-for-/).
 
-Latest Status
+
+
+<p align="center">Latest Status</p>
 <p align="center"><iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1314847/widgets/280945"></iframe></p>
