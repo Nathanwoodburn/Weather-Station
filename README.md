@@ -14,6 +14,6 @@ Using the [instructable to convert images to Flash memory](https://www.instructa
 <p align="center"><iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/1314847/widgets/280945"></iframe></p>
 
 
-Code for Getting weather, desterilize json, get custom message and display on screen.
+Code for Getting current time, getting weather and forecast, desterilize json, get custom message and display on screen.
 
 <script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2FNathanwoodburn%2FWeather-Station%2Fblob%2Fmain%2Fweather_station%2Fweather_station.ino&style=atom-one-dark&showLineNumbers=on"></script>
