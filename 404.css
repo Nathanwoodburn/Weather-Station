@@ -1,0 +1,76 @@
+.center{text-align:center}
+#space-invaders {
+  margin: 0 auto;
+  display: block;
+  background: white
+}
+t2 {
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  font-size: 22px;
+  text-align: center;
+  font-weight: 900;
+  text-decoration: none;
+  color: black;
+  position: absolute;
+  left: 38.5%;
+  background-size: 120% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  -ms-background-clip: text;
+  -ms-text-fill-color: transparent;
+  background-clip: text;
+  background-color: #000000;
+  animation: 0.2s shake infinite alternate;
+}
+p.mobile { display: none }
+@media (max-width: 640px) {
+    p.mobile { display: block }
+    p.desktop { display: none }
+}
+@keyframes shake {
+  0% { left: 38.43%; }
+  2.5% { left: 38.57%; }
+  5% { left: 38.43%; }
+  7.5% { left: 38.57%; }
+  10% { left: 38.43%; }
+  12.5% { left: 38.57%; }
+  15% { left: 38.43%; }
+  17.5% { left: 38.57%; }
+  20% { left: 38.43%; }
+  22.5% { left: 38.57%; }
+  25% { left: 38.43%; }
+  27.5% { left: 38.57%; }
+  30% { left: 38.43%; }
+  32.5% { left: 38.57%; }
+  35% { left: 38.43%; }
+  37.5% { left: 38.57%; }
+  40% { left: 38.43%; }
+  42.5% { left: 38.57%; }
+  45% { left: 38.43%; }
+  47.5% { left: 38.57%; }
+  50% { left: 38.43%; }
+  52.5% { left: 38.57%; }
+  /*55% { left: 38.43%; }
+  57.5% { left: 38.57%; }
+  60% { left: 38.43%; }
+  62.5% { left: 38.57%; }
+  65% { left: 38.43%; }
+  67.5% { left: 38.57%; }
+  70% { left: 38.43%; }
+  72.5% { left: 38.57%; }
+  75% { left: 38.43%; }
+  77.5% { left: 38.57%; }
+  80% { left: 38.43%; }
+  82.5% { left: 38.57%; }
+  85% { left: 38.43%; }
+  87.5% { left: 38.57%; }
+  90% { left: 38.43%; }
+  92.5% { left: 38.57%; }
+  95% { left: 38.43%; }
+  97.5% { left: 38.57%; }
+  100% { left: 38.43%; } */
+}
