@@ -1,16 +1,15 @@
-//Editable settings
+//General Settings
 int screens = 4; // Times the weather screens loop
 int loop_delay = 8; //Time in seconds between each screen
 int screen_rotation = 0; //screen rotation (0-4)
-bool show_time = false; //Whether time should be displayed
+bool show_time = true; //Whether time should be displayed
 
 //WIFI Settings
-const char* ssid = "WIFI";  //Wifi SSID (Name)
-const char* password = "Your P@$$w0rd"; //Wifi Password
-String APIKEY = "Your API KEY";
-
-//Permenent Stuff
+const char* ssid = "YOUR WIFI SSID";
+const char* password = "WIFI PASSWORD";
 const char* host = "api.thingspeak.com";
+
+//Includes
 #include <Adafruit_ST7735.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -30,11 +29,13 @@ Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS,  TFT_DC, TFT_RST);
 
 
 WiFiClient client;
-//Permenent Settings DO NOT CHANGE!!!
-String location = "Canberra,AU"; // In City,Country code
+
+//Permenent Settings
+String APIKEY = "YOUR API KEY"; //OpenWeathermap.org api key
+String location = "Canberra,AU"; //City, Country Code
 char server[] = "api.openweathermap.org";
 //Code variables DO NOT CHANGE!!!
-bool errors;
+String errors;
 int main_temp1;
 String main_weather1;
 int main_max1;
@@ -62,7 +63,7 @@ String icon_3;
 void setup() {
   Serial.begin(9600);
   bool load1used = false;
-  errors = false;
+  errors = "";
   tft.initR(INITR_144GREENTAB);
   tft.setRotation(tft.getRotation() + screen_rotation);
 
@@ -84,9 +85,9 @@ void setup() {
   Serial.println("\nConnected");
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
-  //configTime(11 * 3600, 0, "pool.ntp.org", "time.nist.gov"); // set arduino time from internet server (plus 11 hrs for time zone)
+
   Serial.println("Getting Time");
-  String time_now = "2021-03-05T09:33:42.149772+11:00";
+  String time_now = "2021-00-00T00:00:00.000000+11:00";
   int day_0 = 0;
   HTTPClient http;  //Declare an object of class HTTPClient
   http.begin("http://worldtimeapi.org/api/timezone/Australia/Canberra");  //connect to the weather site
@@ -130,27 +131,24 @@ void setup() {
   }
   http.end();   //Close connection
   Serial.println("Ready");
+  time_now = time_now.substring(11, 16);
+  //getWeather(day_0, time_now.substring(11, 16));
 
-  getWeather(day_0, time_now.substring(11, 16));
-  Serial.println("Entering Deep Sleep");
-  tft.fillScreen(ST7735_BLACK);
-  delay(20000);
-  //ESP.deepSleep(ESP.deepSleepMax()); // go into deep sleep
-  ESP.deepSleep(0);
-  delay(10); //let arduino go to sleep
-}
-void loop() {
-  Serial.println("Sleep Failed"); //tell user if deep sleep failed
-  delay(100000); //Wait 100 sec
-}
-void getWeather(int dayofweek, String time_now) {
+
+  int dayofweek = day_0;
   int main_humidity1;
   int main_pressure1;
   int retry = 0;
+  errors = "";
+  if (time_now == "00:00")
+  {
+    errors = "1";
+    Serial.println("Failed to get time");
+  }
   if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
 currentweather:
     HTTPClient http;  //Declare an object of class HTTPClient
-    http.begin("http://api.openweathermap.org/data/2.5/weather?q=Canberra,AU&APPID=<Your api key>&units=metric");  //connect to the weather site
+    http.begin("http://api.openweathermap.org/data/2.5/weather?q=Canberra,AU&APPID=YOUR API KEY&units=metric");  //connect to the weather site
     int httpCode = http.GET();                                  //Send the request
 
     if (httpCode > 0) { //Check the returning code
@@ -220,7 +218,7 @@ currentweather:
     }
     else
     {
-      errors = true;
+      errors = errors + "2";
       Serial.println("Error Getting Weather Data");
       retry += 1;
       if (retry < 5)
@@ -235,7 +233,7 @@ currentweather:
     }
 forecast:
     HTTPClient http3;  //Declare an object of class HTTPClient
-    http3.begin("http://api.openweathermap.org/data/2.5/onecall?lat=-35.2835&lon=149.1281&exclude=current,minutely,hourly,alerts&appid=<Your api Key>&units=metric");  //Request forecast
+    http3.begin("http://api.openweathermap.org/data/2.5/onecall?lat=-35.2835&lon=149.1281&exclude=current,minutely,hourly,alerts&appid=YOUR API KEY&units=metric");  //Request forecast
     int httpCode3 = http3.GET();                                  //Send the request
     if (httpCode3 > 0) { //Check the returning code
       String input = http3.getString();   //Get the request response payload
@@ -721,7 +719,7 @@ forecast:
     }
     else
     {
-      errors = true;
+      errors = errors + "3";
       Serial.println("Error Getting Forecast Data");
       retry += 1;
 
@@ -735,8 +733,11 @@ forecast:
         Serial.println("Retry Timeout");
       }
     }
+
+    //start custom text
+
     HTTPClient thinkspeak;
-    thinkspeak.begin("http://api.thingspeak.com/talkbacks/<command id>/commands.json?apikey=<thingspeak talkback api key>");
+    thinkspeak.begin("http://api.thingspeak.com/talkbacks/TALK BACK ID/commands.json?apikey=TALK BACK API KEY");
     int httpCode9 = thinkspeak.GET();
     if (httpCode9 > 0) { //Check the returning code
       String input = thinkspeak.getString();   //Get the request response payload
@@ -765,7 +766,7 @@ forecast:
       for (JsonObject elem : doc.as<JsonArray>()) {
 
         long id = elem["id"]; // 22014661, 22051257, 22051285
-        const char* command_string = elem["command_string"]; // "Go to ql.woodburn.tk/weather", "True", "True"
+        const char* command_string = elem["command_string"]; // "Go to weather.woodburn.tk", "True", "True"
         if (number1 == 1)
         {
           custom_text = command_string;
@@ -773,13 +774,13 @@ forecast:
         else if (number1 == 2)
         {
           String useclock(command_string);
-          if (useclock == "True")
+          if (useclock == "False")
           {
-            show_time = true;
+            show_time = false;
           }
           else
           {
-            show_time = false;
+            show_time = true;
           }
         }
         else
@@ -807,12 +808,31 @@ forecast:
     }
     else
     {
-      errors = true;
+      errors = errors + "4";
       Serial.println("Error");
     }
+
+    //if getting time failed retry now
+    if (time_now == "00:00") {
+      time_now = get_time_now();
+    }
+
+
+
+    //end custom message
     //Print screens
 
-
+if (errors == "")
+    {
+      Serial.println("No Errors");
+      errors = "0";
+    }
+    else
+    {
+      Serial.print("Error code: ");
+      Serial.println(errors);
+    }
+    Serial.println("Printing Screens");
     for (int i = 0; i < screens; i++) {
 
       Serial.println("Printing First Screen");
@@ -820,14 +840,12 @@ forecast:
       //draw background
       if (drawbackground(icon_1))
       {
-        errors = true;
+        errors = errors + "5";
       }
       tft.setCursor(60, 5);
       tft.setTextWrap(false);
-      if (show_time) {
-        tft.setTextSize(2);
-        tft.print(time_now);
-      }
+      tft.setTextSize(2);
+      tft.print(time_now);
       tft.setTextSize(2);
       tft.print("\n\n ");
       tft.print(main_temp1);
@@ -851,14 +869,12 @@ forecast:
       //draw background
       if (drawbackground(icon_2))
       {
-        errors = true;
+        errors = errors + "5";
       }
       tft.setCursor(60, 5);
       tft.setTextWrap(false);
-      if (show_time) {
-        tft.setTextSize(2);
-        tft.print(time_now);
-      }
+      tft.setTextSize(2);
+      tft.print(time_now);
       tft.setTextSize(2);
       tft.print("\n\n Tomorrow\n ");
       tft.print(min_1);
@@ -880,14 +896,12 @@ forecast:
       //draw background
       if (drawbackground(icon_3))
       {
-        errors = true;
+        errors = errors + "5";
       }
       tft.setCursor(60, 5);
       tft.setTextWrap(false);
-      if (show_time) {
-        tft.setTextSize(2);
-        tft.print(time_now);
-      }
+      tft.setTextSize(2);
+      tft.print(time_now);
       tft.setTextSize(2);
       tft.print("\n\n ");
       tft.print(day_2);
@@ -905,12 +919,12 @@ forecast:
       tft.print(message_0);
       delay(loop_delay * 1000);
     }
-
-
+    Serial.println("Finished Printing Screens");
+    
     Serial.println("Giving Status Report");
     if (client.connect(host, 80))
     {
-      String postStr = "<thingspeak api>";
+      String postStr = "THINGSPEAK API KEY";
       postStr += "&field1=";
       postStr += String(main_temp1);
       postStr += "&field2=";
@@ -918,13 +932,13 @@ forecast:
       postStr += "&field3=";
       postStr += String(main_pressure1);
       postStr += "&field4=";
-      postStr += String(errors);
+      postStr += errors;
       postStr += "\r\n\r\n";
 
       client.print("POST /update HTTP/1.1\n");
       client.print("Host: api.thingspeak.com\n");
       client.print("Connection: close\n");
-      client.print("X-THINGSPEAKAPIKEY: <thingspeak api key>\n");
+      client.print("X-THINGSPEAKAPIKEY: THINGSPEAK API KEY\n");
       client.print("Content-Type: application/x-www-form-urlencoded\n");
       client.print("Content-Length: ");
       client.print(postStr.length());
@@ -938,23 +952,13 @@ forecast:
     }
     delay(1000);
     client.stop();
-
-    Serial.println("Number of Errors:");
-    Serial.println(errors);
-
   }
   else
   {
     Serial.println("WIFI Not Connected");
-//    tft.fillScreen(ST7735_ORANGE);
-//    tft.setCursor(0, 50);
-//    tft.setTextSize(2);
-//    tft.print(" Failed\n to\n Connect");
     int h = 128, w = 128, row, col, buffidx = 0;
     for (row = 0; row < h; row++) { // For each scanline...
       for (col = 0; col < w; col++) { // For each pixel...
-        //To read from Flash Memory, pgm_read_XXX is required.
-        //Since image is stored as uint16_t, pgm_read_word is used as it uses 16bit address
         tft.drawPixel(col, row, pgm_read_word(internet + buffidx));
         buffidx++;
       } // end pixel
@@ -962,41 +966,24 @@ forecast:
     delay(2000);
     ESP.restart();
   }
+
+  Serial.println("Entering Deep Sleep");
+  tft.fillScreen(ST7735_BLACK);
+  delay(20000);
+  ESP.deepSleep(0);
+  delay(10); //let arduino go to sleep
 }
-void loadimage(bool image1)
-{
-  if (image1)
-  {
-    int h = 128, w = 128, row, col, buffidx = 0;
-    for (row = 0; row < h; row++) { // For each scanline...
-      for (col = 0; col < w; col++) { // For each pixel...
-        //To read from Flash Memory, pgm_read_XXX is required.
-        //Since image is stored as uint16_t, pgm_read_word is used as it uses 16bit address
-        tft.drawPixel(col, row, pgm_read_word(load1 + buffidx));
-        buffidx++;
-      } // end pixel
-    }
-  }
-  else
-  {
-    int h = 128, w = 128, row, col, buffidx = 0;
-    for (row = 0; row < h; row++) { // For each scanline...
-      for (col = 0; col < w; col++) { // For each pixel...
-        //To read from Flash Memory, pgm_read_XXX is required.
-        //Since image is stored as uint16_t, pgm_read_word is used as it uses 16bit address
-        tft.drawPixel(col, row, pgm_read_word(load2 + buffidx));
-        buffidx++;
-      } // end pixel
-    }
-  }
+void loop() {
+  Serial.println("Sleep Failed"); //tell user if deep sleep failed
+  tft.fillScreen(ST7735_BLUE);
+  delay(100000); //Wait 100 sec
 }
+
 bool drawbackground(String icon_0) {
   bool result = false;
   int h = 128, w = 128, row, col, buffidx = 0;
   for (row = 0; row < h; row++) { // For each scanline...
     for (col = 0; col < w; col++) { // For each pixel...
-      //To read from Flash Memory, pgm_read_XXX is required.
-      //Since image is stored as uint16_t, pgm_read_word is used as it uses 16bit address
       if (icon_0 == "01d" || icon_0 == "01n") {
         tft.drawPixel(col, row, pgm_read_word(clearsky + buffidx));
       }
@@ -1023,4 +1010,74 @@ bool drawbackground(String icon_0) {
     } // end pixel
   }
   return result;
+}
+String get_time_now() {
+  String time_now = "2021-00-00T00:00:00.000000+11:00";
+  int day_0 = 0;
+  HTTPClient http;  //Declare an object of class HTTPClient
+  http.begin("http://worldtimeapi.org/api/timezone/Australia/Canberra");  //connect to the weather site
+  int httpCode = http.GET();                                  //Send the request
+
+  if (httpCode > 0) { //Check the returning code
+    String input = http.getString();   //Get the request response payload
+    StaticJsonDocument<768> doc;
+
+    DeserializationError error = deserializeJson(doc, input);
+
+    if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      return "00:00";
+    }
+
+    const char* abbreviation = doc["abbreviation"]; // "AEDT"
+    const char* client_ip = doc["client_ip"]; // "121.45.204.2"
+    const char* datetime = doc["datetime"]; // "2021-03-05T09:29:52.136250+11:00"
+    int day_of_week = doc["day_of_week"]; // 5
+    int day_of_year = doc["day_of_year"]; // 64
+    bool dst = doc["dst"]; // true
+    const char* dst_from = doc["dst_from"]; // "2020-10-03T16:00:00+00:00"
+    int dst_offset = doc["dst_offset"]; // 3600
+    const char* dst_until = doc["dst_until"]; // "2021-04-03T16:00:00+00:00"
+    long raw_offset = doc["raw_offset"]; // 36000
+    const char* timezone = doc["timezone"]; // "Australia/Canberra"
+    long unixtime = doc["unixtime"]; // 1614896992
+    const char* utc_datetime = doc["utc_datetime"]; // "2021-03-04T22:29:52.136250+00:00"
+    const char* utc_offset = doc["utc_offset"]; // "+11:00"
+    int week_number = doc["week_number"]; // 9
+    time_now = datetime;
+    day_0 = day_of_week;
+    Serial.print("Time: ");
+    Serial.println(time_now.substring(11, 16));
+    return time_now.substring(11, 16);
+  }
+  else
+  {
+    Serial.println("Failed to get time");
+    return "00:00";
+  }
+  http.end();   //Close connection
+}
+void loadimage(bool image1)
+{
+  if (image1)
+  {
+    int h = 128, w = 128, row, col, buffidx = 0;
+    for (row = 0; row < h; row++) { // For each scanline...
+      for (col = 0; col < w; col++) { // For each pixel...
+        tft.drawPixel(col, row, pgm_read_word(load1 + buffidx));
+        buffidx++;
+      } // end pixel
+    }
+  }
+  else
+  {
+    int h = 128, w = 128, row, col, buffidx = 0;
+    for (row = 0; row < h; row++) { // For each scanline...
+      for (col = 0; col < w; col++) { // For each pixel...
+         tft.drawPixel(col, row, pgm_read_word(load2 + buffidx));
+        buffidx++;
+      } // end pixel
+    }
+  }
 }
