@@ -31,4 +31,4 @@ Using the [instructable to convert images to Flash memory](https://www.instructa
 
 Code for Getting current time, getting weather and forecast, desterilize json, get custom message and display on screen.
 
-<script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2FNathanwoodburn%2FWeather-Station%2Fblob%2Fmain%2Fweather_station%2Fweather_station.ino&style=atom-one-dark&showLineNumbers=on"></script>
+<script src="https://emgithub.com/embed.js?target=https%3A%2F%2Fgithub.com%2FNathanwoodburn%2FWeather-Station%2Fblob%2Fmain%2FArduino%2520Code%2Fweather_station%2Fweather_station.ino&style=atom-one-dark&showLineNumbers=on"></script>
