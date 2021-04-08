@@ -1,2 +1,3 @@
 theme: jekyll-theme-slate
 site_favicon: favicon.png
+show_downloads: true
